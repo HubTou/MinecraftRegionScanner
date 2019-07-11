@@ -1,6 +1,6 @@
 # About Minecraft Region Scanner
 
-A Minecraft 1.7.10 (only) command line utility to analyze and edit region files
+A Minecraft 1.7.10 (only) command line utility to analyze and edit region files.
 
 This utility fully supports the Lord of the Rings mod (LOTRmod) v34.3.
 
