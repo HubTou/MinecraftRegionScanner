@@ -48,6 +48,8 @@ The Java Archive (jar) file used for binary distribution bundles 2 external libr
 
 - Apache Commons CLI 1.4 (see https://commons.apache.org/proper/commons-cli/)
 
+The source code includes a snippet of code from lxknvlk (https://stackoverflow.com/users/3060279/lxknvlk) found at https://stackoverflow.com/questions/16273318/transliteration-from-cyrillic-to-latin-icu4j-java to transliterate cyrillic to latin.
+
 # Author
 
 Hubert Tournier
