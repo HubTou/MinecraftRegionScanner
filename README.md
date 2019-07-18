@@ -1,8 +1,8 @@
 # About Minecraft Region Scanner
 
-A Minecraft 1.7.10 (only) command line utility to analyze and edit region files.
+A Minecraft 1.7.10 (only) command line utility to analyze and mass edit region files.
 
-This utility fully supports the Lord of the Rings mod (LOTRmod) v34.3.
+This utility fully supports the Lord of the Rings mod (LOTRmod) v35.2.
 
 # Compilation
 
@@ -16,9 +16,9 @@ Please check the tool's wiki at https://lotr-minecraft-mod-exiles.fandom.com/wik
 
 # Versions and changelog
 
-1.00 2019-07-11
+1.00 2019-07-18
 
-    Initial public release. Supports v34.3 of the Lord of the Rings mod (LOTRmod)
+    Initial public release. Supports v34.3 to v35.2 of the Lord of the Rings mod (LOTRmod)
 
 # Caveats
 
@@ -50,8 +50,10 @@ The Java Archive (jar) file used for binary distribution bundles 2 external libr
 
 The source code includes a snippet of code from lxknvlk (https://stackoverflow.com/users/3060279/lxknvlk) found at https://stackoverflow.com/questions/16273318/transliteration-from-cyrillic-to-latin-icu4j-java to transliterate cyrillic to latin.
 
+The project logo is derived from EditOrange (https://www.deviantart.com/editorange) "Chunk #1" picture.
+
 # Author
 
 Hubert Tournier
 
-11 July 2019
+18 July 2019
