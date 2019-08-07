@@ -19,7 +19,7 @@ Please check the tool's wiki at https://lotr-minecraft-mod-exiles.fandom.com/wik
 1.01 2019-08-06
 
     - Fixed bug #1 (Tile entities for modified or deleted blocks are not removed)
-    - Detect and report invalid chunk locations
+    - Added detection and report of invalid chunk locations
 
 1.00 2019-07-18
 
