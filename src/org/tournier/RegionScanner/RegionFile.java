@@ -452,7 +452,7 @@ public class RegionFile
 				}
 			}
 
-			// the following code might generate an exception is option -u is not used:
+			// the following code might generate an exception if option -u is not used:
 			name = RegionScanner.blocksAndItems.getItemName(value);
 
 			if (! RegionScanner.toLevel.equals("") && RegionScanner.modifiedItems.containsKey(value))
@@ -902,6 +902,12 @@ public class RegionFile
 				int[] chunkCoordinates = new int[2];
 				chunkCoordinates[0] = level.getInt("xPos");
 				chunkCoordinates[1] = level.getInt("zPos");
+				if (chunkCoordinates[0] < (xRegion * REGION_WIDTH_IN_CHUNKS)
+					|| chunkCoordinates[0] > ((xRegion * REGION_WIDTH_IN_CHUNKS) + (REGION_WIDTH_IN_CHUNKS - 1))
+					|| chunkCoordinates[1] < (zRegion * REGION_WIDTH_IN_CHUNKS)
+					|| chunkCoordinates[1] > ((zRegion * REGION_WIDTH_IN_CHUNKS) + (REGION_WIDTH_IN_CHUNKS - 1))
+				   )
+					throw new Exception("Invalid chunk location. (" + chunkCoordinates[0] + "," + chunkCoordinates[1] + ") is out of (" + (xRegion * REGION_WIDTH_IN_CHUNKS) + "," + (zRegion * REGION_WIDTH_IN_CHUNKS) + ") to (" + ((xRegion * REGION_WIDTH_IN_CHUNKS) + (REGION_WIDTH_IN_CHUNKS - 1)) + "," + ((zRegion * REGION_WIDTH_IN_CHUNKS) + (REGION_WIDTH_IN_CHUNKS - 1)) + ") chunk range");
 				chunksList.add(chunkCoordinates);
 
 				if ((RegionScanner.chunksToDelete != null && RegionScanner.chunksToDelete.contains(chunkCoordinates[0] + "," + chunkCoordinates[1])) || (RegionScanner.chunksToPreserve != null && ! RegionScanner.chunksToPreserve.contains(chunkCoordinates[0] + "," + chunkCoordinates[1])))
@@ -1038,9 +1044,9 @@ public class RegionFile
 										int rY = (pos / (CHUNK_WIDTH_IN_BLOCKS * CHUNK_WIDTH_IN_BLOCKS));
 										int rZ = ((pos % (CHUNK_WIDTH_IN_BLOCKS * CHUNK_WIDTH_IN_BLOCKS)) / CHUNK_WIDTH_IN_BLOCKS);
 	
-										int bX = xRegion + rX;
-										int bY = (yPos * SECTION_HEIGTH_IN_BLOCKS)  + rY;
-										int bZ = zRegion + rZ;
+										int bX = (chunkCoordinates[0] * CHUNK_WIDTH_IN_BLOCKS) + rX;
+										int bY = (yPos * SECTION_HEIGTH_IN_BLOCKS) + rY;
+										int bZ = (chunkCoordinates[1] * CHUNK_WIDTH_IN_BLOCKS) + rZ;
 	
 										// do we need to modify the HeightMap?
 										if (heightMap[c] != null && heightMap[c][rX + (16 * rZ)] == bY + 1)
@@ -1058,7 +1064,7 @@ public class RegionFile
 										}
 		
 										// take note of this block location for deleting potential tile entities
-										deletedBlocks.put(bX + ":" + bY + ":" + bZ, "");
+										deletedBlocks.put(bX + ":" + bY + ":" + bZ, "air:0");
 	
 										continue;
 									}
@@ -1100,9 +1106,9 @@ public class RegionFile
 									int rY = (pos / (CHUNK_WIDTH_IN_BLOCKS * CHUNK_WIDTH_IN_BLOCKS));
 									int rZ = ((pos % (CHUNK_WIDTH_IN_BLOCKS * CHUNK_WIDTH_IN_BLOCKS)) / CHUNK_WIDTH_IN_BLOCKS);
 
-									int bX = xRegion + rX;
-									int bY = (yPos * SECTION_HEIGTH_IN_BLOCKS)  + rY;
-									int bZ = zRegion + rZ;
+									int bX = (chunkCoordinates[0] * CHUNK_WIDTH_IN_BLOCKS) + rX;
+									int bY = (yPos * SECTION_HEIGTH_IN_BLOCKS) + rY;
+									int bZ = (chunkCoordinates[1] * CHUNK_WIDTH_IN_BLOCKS) + rZ;
 	
 									if (replacementBlock.equalsIgnoreCase("DELETE"))
 									{
@@ -1129,7 +1135,7 @@ public class RegionFile
 										}
 	
 										// take note of this block location for deleting potential tile entities
-										deletedBlocks.put(bX + ":" + bY + ":" + bZ, "");
+										deletedBlocks.put(bX + ":" + bY + ":" + bZ, "air:0");
 									}
 									else if (replacementBlock.equalsIgnoreCase("AMBIANT"))
 									{
@@ -1328,7 +1334,7 @@ public class RegionFile
 							}
 						}
 					}
-	
+
 					// Processing the tile entities list
 					if (level.containsKey("TileEntities"))
 					{

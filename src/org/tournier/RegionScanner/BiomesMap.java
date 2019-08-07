@@ -682,7 +682,7 @@ public class BiomesMap
 			throw new Exception("--map parameter is not a picture");
 
 		if (mx < 0 || mz < 0)
-			throw new Exception("Invalid LOR mod map coordinates");
+			throw new Exception("Invalid LOTR mod map coordinates");
 
 		if (mx > image.getWidth() || mz > image.getHeight())
 			return "2:89:141"; // Ocean
