@@ -2,7 +2,7 @@
 
 A Minecraft 1.7.10 (only) command line utility to analyze and mass edit region files.
 
-This utility fully supports the Lord of the Rings mod (LOTRmod) v35.2.
+This utility fully supports the Lord of the Rings mod (LOTRmod) v35.3.
 
 # Compilation
 
@@ -15,6 +15,11 @@ You'll need a Java Compiler (I used Java 1.8) and a zip package.
 Please check the tool's wiki at https://lotr-minecraft-mod-exiles.fandom.com/wiki/Minecraft_Region_Scanner.
 
 # Versions and changelog
+
+1.01 2019-08-06
+
+    - Fixed bug #1 (Tile entities for modified or deleted blocks are not removed)
+    - Detect and report invalid chunk locations
 
 1.00 2019-07-18
 
@@ -56,4 +61,4 @@ The project logo is derived from EditOrange (https://www.deviantart.com/editoran
 
 Hubert Tournier
 
-18 July 2019
+6 August 2019
