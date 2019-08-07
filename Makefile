@@ -1,4 +1,4 @@
-VERSION=1.0
+VERSION=1.01
 
 JC= javac
 CLASSPATH= lib/commons-cli-1.4.jar:lib/nbt-4.0.jar
