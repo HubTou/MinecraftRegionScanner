@@ -27,6 +27,7 @@ public class RegionScanner
 	public static HashMap<String, String> blocksToReplace = null;
 	public static HashMap<String, String> itemsToReplace = null;
 	public static boolean scan = false;
+	public static boolean fixStacks = false;
 	public static String toLevel = "";
 	public static boolean fixUnknown = false;
 	public static List<String> regionFilesToProcess = null;
@@ -140,6 +141,13 @@ public class RegionScanner
 			.required(false) 
 			.build();
 	
+		Option stacksOption = Option.builder("S") 
+			.longOpt("stacks")
+			.desc("Fix item stacks of more than 64 items") 
+			.hasArg(false) 
+			.required(false) 
+			.build();
+	
 		Option toOption = Option.builder("t") 
 			.longOpt("to") 
 			.desc("level.dat file providing the blocks & items new values") 
@@ -171,6 +179,7 @@ public class RegionScanner
 		options.addOption(preserveOption);			// p
 		options.addOption(replaceOption);			// r
 		options.addOption(scanOption);				// s
+		options.addOption(stacksOption);			// S
 		options.addOption(toOption);				// t
 		options.addOption(unknownOption);			// u
 	
@@ -442,6 +451,8 @@ public class RegionScanner
 			}
 			if (command.hasOption("scan"))
 				scan = true;
+			if (command.hasOption("stacks"))
+				fixStacks = true;
 			if (command.hasOption("to"))
 			{
 				verifyFileParameterOrExit(command.getOptionValue("to", ""), "to parameter");
@@ -456,7 +467,7 @@ public class RegionScanner
         		System.err.println( "WARNING: no region file to process");
 				System.exit(0);
 			}
-			else if (fixUnknown == false && chunksToDelete == null && entitiesToKill == null && fixNames == false && chunksToPreserve == null && blocksToReplace == null && itemsToReplace == null && scan == false && toLevel.equals(""))
+			else if (fixUnknown == false && chunksToDelete == null && entitiesToKill == null && fixNames == false && chunksToPreserve == null && blocksToReplace == null && itemsToReplace == null && scan == false && fixStacks == false && toLevel.equals(""))
 			{
         		System.err.println( "WARNING: no actions specified");
 				System.exit(0);

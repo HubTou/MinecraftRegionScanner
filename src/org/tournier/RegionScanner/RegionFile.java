@@ -61,6 +61,7 @@ public class RegionFile
 	int replacedItemsCount = 0;
 	int	replacedItemCount[] = new int[MAX_ITEM_ID];
 	int translatedNamesCount = 0;
+	int oversizeItemStacks = 0;
 
 	///////////////////
 	public RegionFile()
@@ -391,9 +392,9 @@ public class RegionFile
 				damage = tag.getShort("Damage");
 
 			if (damage > 0)
-				System.out.println(additionalIndent + "       i# " + count + "x " + name + ":" + damage); 
+				System.out.println(additionalIndent + "       i# " + (count & 0xFF) + "x " + name + ":" + damage); 
 			else
-				System.out.println(additionalIndent + "       i# " + count + "x " + name); 
+				System.out.println(additionalIndent + "       i# " + (count & 0xFF) + "x " + name); 
 			if (tag.containsKey("tag"))
 			{ 
 				CompoundTag remainingTags = tag.getCompoundTag("tag");
@@ -596,6 +597,17 @@ public class RegionFile
 						change = 1;
 						remainingTags.putString("author", newName);
 					}
+				}
+			}
+
+			if (RegionScanner.fixStacks == true && item.containsKey("Count"))
+			{
+				byte count = item.getByte("Count");
+				if ((count & 0xFF) > 64)
+				{
+					oversizeItemStacks++;
+					item.putByte("Count", (byte) 64);
+					change = 1;
 				}
 			}
 		}
@@ -1659,6 +1671,8 @@ public class RegionFile
 					System.out.println("    # " + RegionScanner.blocksAndItems.getItemName(id) + "(" + id + "=>" + replacementItem + ") = " + replacedItemCount[id]);
 				}
 		}
+		if (RegionScanner.fixStacks == true)
+			System.out.println("  # oversize item stacks = " + oversizeItemStacks);
 		if (RegionScanner.scan == true)
 		{
 			System.out.println("  # entities = " + entitiesCount);
