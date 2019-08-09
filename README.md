@@ -16,6 +16,14 @@ Please check the tool's wiki at https://lotr-minecraft-mod-exiles.fandom.com/wik
 
 # Versions and changelog
 
+1.02 2019-08-09
+
+    - Provided our test bed in test/r.0.0.mca
+    - Updated Querz NBT library to 4.1
+    - Modified the Makefile to fetch and build external libraries
+    - Fixed a display bug causing negative stacks of items when there are more than 127
+    - Added new option -S / --stacks to fix stacks of more than 64 items
+
 1.01 2019-08-06
 
     - Fixed bug #1 (Tile entities for modified or deleted blocks are not removed)
@@ -49,7 +57,7 @@ This open source software is distributed under a BSD license (see the "License" 
 
 The Java Archive (jar) file used for binary distribution bundles 2 external libraries:
 
-- Querz NBT 4.0 (see https://github.com/Querz/NBT)
+- Querz NBT 4.1 (see https://github.com/Querz/NBT)
 
 - Apache Commons CLI 1.4 (see https://commons.apache.org/proper/commons-cli/)
 
@@ -61,4 +69,4 @@ The project logo is derived from EditOrange (https://www.deviantart.com/editoran
 
 Hubert Tournier
 
-6 August 2019
+August 9, 2019
