@@ -878,6 +878,8 @@ public class RegionFile
 		HashMap<String, Integer> entityCount = new HashMap<String, Integer>();
 		int entitiesKilledCount = 0;
 		HashMap<String, Integer> entityKilledCount = new HashMap<String, Integer>();
+		int excessiveEntitiesCount = 0;
+		HashMap<String, Integer> excessiveEntitityCount = new HashMap<String, Integer>();
 
 		int tileEntitiesCount = 0;
 		HashMap<String, Integer> tileEntityCount = new HashMap<String, Integer>();
@@ -1277,6 +1279,8 @@ public class RegionFile
 						{
 							entities[c] = level.getListTag("Entities");
 							int changes = 0;
+
+							HashMap<String, Integer> entitiesByLocation = new HashMap<String, Integer>();
 		
 							for (Iterator k = entities[c].iterator(); k.hasNext();)
 							{
@@ -1285,56 +1289,95 @@ public class RegionFile
 								if (entity.containsKey("id"))
 								{
 									String id = entity.getString("id");
+									int count;
 	
 									if (RegionScanner.entitiesToKill != null && RegionScanner.entitiesToKill.contains(id))
 									{
 										entitiesKilledCount++;
 										if (entityKilledCount.containsKey(id))
-										{
-											int count = entityKilledCount.get(id) + 1;
-											entityKilledCount.put(id, count);
-										}
+											count = entityKilledCount.get(id) + 1;
 										else
-											entityKilledCount.put(id, 1);
+											count = 1;
+										entityKilledCount.put(id, count);
 	
 										k.remove();
 										changes++;
 									}
 									else
 									{
-										entitiesCount++;
-										if (entityCount.containsKey(id))
+										ListTag pos = entity.getListTag("Pos");
+										DoubleTag[] coordinates = new DoubleTag[3];
+										int j = 0;
+										for (Iterator l = pos.iterator(); l.hasNext();)
 										{
-											int count = entityCount.get(id) + 1;
-											entityCount.put(id, count);
+											coordinates[j] = (DoubleTag) l.next();
+											j++;
+											if (j == 3)
+												break;
+										}
+										// get the integer part of the coordinates:
+										int x = (int) coordinates[0].asDouble();
+										int y = (int) coordinates[1].asDouble();
+										int z = (int) coordinates[2].asDouble();
+										String key = id + ":" + x + ":" + y + ":" + z;
+										if (entitiesByLocation.containsKey(key))
+											count = entitiesByLocation.get(key) + 1;
+										else
+											count = 1;
+										entitiesByLocation.put(key, count);
+
+										if (count >= RegionScanner.maxEntities)
+										{
+											excessiveEntitiesCount++;
+											if (excessiveEntitityCount.containsKey(id))
+												count = excessiveEntitityCount.get(id) + 1;
+											else
+												count = 1;
+											excessiveEntitityCount.put(id, count);
+										}
+
+										if (RegionScanner.fixEntities == true && count >= RegionScanner.maxEntities)
+										{
+											k.remove();
+											changes++;
 										}
 										else
-											entityCount.put(id, 1);
+										{
+											int change = processItems(entity);
+											if (change == -1)
+											{
+												changes++;
+												k.remove();
+											}
+											else
+											{
+												if (change == 1)
+													changes++;
+
+												entitiesCount++;
+												if (entityCount.containsKey(id))
+													count = entityCount.get(id) + 1;
+												else
+													count = 1;
+												entityCount.put(id, count);
+
+												if (RegionScanner.fixNames == true && entity.containsKey("NPCName"))
+												{
+													String originalName = entity.getString("NPCName");
+													String newName = transliterateCyrillicToLatin(originalName);
+													if (! newName.equals(originalName))
+													{
+														translatedNamesCount++;
+														changes++;
+														entity.putString("NPCName", newName);
+													}
+												}
+											}
+										}
 									}
 								}
 								else
 									throw new Exception("Invalid entity in chunk. No [level/Entities/id] key");
-		
-								int change = processItems(entity);
-								if (change == 1)
-									changes++;
-								else if (change == -1)
-								{
-									changes++;
-									k.remove();
-								}
-
-								if (RegionScanner.fixNames == true && entity.containsKey("NPCName"))
-								{
-									String originalName = entity.getString("NPCName");
-									String newName = transliterateCyrillicToLatin(originalName);
-									if (! newName.equals(originalName))
-									{
-										translatedNamesCount++;
-										changes++;
-										entity.putString("NPCName", newName);
-									}
-								}
 							}
 		
 							if (changes > 0)
@@ -1379,27 +1422,31 @@ public class RegionFile
 							{
 								if (tileEntity.containsKey("id"))
 								{
-									tileEntitiesCount++;
-									String id = tileEntity.getString("id");
-									if (tileEntityCount.containsKey(id))
+									int change = processItems(tileEntity);
+									if (change == -1)
 									{
-										int count = tileEntityCount.get(id) + 1;
-										tileEntityCount.put(id, count);
+										changes++;
+										k.remove();
 									}
 									else
-										tileEntityCount.put(id, 1);
+									{
+										if (change == 1)
+											changes++;
+
+										tileEntitiesCount++;
+										String id = tileEntity.getString("id");
+										if (tileEntityCount.containsKey(id))
+										{
+											int count = tileEntityCount.get(id) + 1;
+											tileEntityCount.put(id, count);
+										}
+										else
+											tileEntityCount.put(id, 1);
+									}
 								}
 								else
 									throw new Exception("Invalid entity in chunk. No [level/TileEntities/id] key");
 		
-								int change = processItems(tileEntity);
-								if (change == 1)
-									changes++;
-								else if (change == -1)
-								{
-									changes++;
-									k.remove();
-								}
 							}
 						}
 	
@@ -1773,8 +1820,20 @@ public class RegionFile
 			for (String id : entityKilledCount.keySet())
 				System.out.println("    # " + id + " = " + entityKilledCount.get(id));
 		}
+		if (RegionScanner.fixEntities == true)
+		{
+			System.out.println("  # excessive entities (> " + RegionScanner.maxEntities + ") in a single spot killed = " + excessiveEntitiesCount);
+			for (String id : excessiveEntitityCount.keySet())
+				System.out.println("    # " + id + " = " + excessiveEntitityCount.get(id));
+		}
 		if (RegionScanner.scan == true)
 		{
+			if (RegionScanner.fixEntities == false)
+			{
+				System.out.println("  # excessive entities (> " + RegionScanner.maxEntities + ") in a single spot = " + excessiveEntitiesCount);
+				for (String id : excessiveEntitityCount.keySet())
+					System.out.println("    # " + id + " = " + excessiveEntitityCount.get(id));
+			}
 			System.out.println("  # tile entities = " + tileEntitiesCount);
 			for (String id : tileEntityCount.keySet())
 				System.out.println("   t# " + id + " = " + tileEntityCount.get(id));  
@@ -1862,6 +1921,10 @@ public class RegionFile
 							CompoundTag entityData = (CompoundTag) tileEntity.getCompoundTag("JarEntityData");
 							if (entityData.containsKey("id"))
 								System.out.println("        # " + entityData.getString("id"));  
+						}
+						else if ((id.equals("MobSpawner") || id.equals("LOTRMobSpawner")) && tileEntity.containsKey("EntityId"))
+						{
+							System.out.println("        # Entity spawned= " + tileEntity.getString("EntityId"));  
 						}
 
 						if (RegionScanner.logLevel > 1)

@@ -17,6 +17,8 @@ public class RegionScanner
 {
 	// Command line options
 	public static List<String> chunksToDelete = null;
+	public static boolean fixEntities = false;
+	public static int maxEntities = 100;
 	public static String fromLevel = "";
 	public static List<String> entitiesToKill = null;
 	public static int logLevel = 0;
@@ -68,6 +70,14 @@ public class RegionScanner
 			.desc("List of chunks to delete, inline (x1,z1/x2,z2/...) or @infile") 
 			.hasArg(true) 
 			.argName("chunksToDelete")
+			.required(false) 
+			.build();
+	
+		Option entitiesOption = Option.builder("e") 
+			.longOpt("fixentities")
+			.desc("Fix excessive number of entities in a single spot") 
+			.hasArg(true) 
+			.argName("fixEntitiesValue")
 			.required(false) 
 			.build();
 	
@@ -142,7 +152,7 @@ public class RegionScanner
 			.build();
 	
 		Option stacksOption = Option.builder("S") 
-			.longOpt("stacks")
+			.longOpt("fixstacks")
 			.desc("Fix item stacks of more than 64 items") 
 			.hasArg(false) 
 			.required(false) 
@@ -157,7 +167,7 @@ public class RegionScanner
 			.build();
 	
 		Option unknownOption = Option.builder("u") 
-			.longOpt("unknown")
+			.longOpt("fixunknown")
 			.desc("Fix unknown blocks") 
 			.hasArg(false) 
 			.required(false) 
@@ -169,6 +179,7 @@ public class RegionScanner
 			options.addOption(firstOption);
 
 		options.addOption(deleteOption);			// d
+		options.addOption(entitiesOption);			// e
 		options.addOption(fromOption);				// f
 													// h (help)
 		options.addOption(killOption);				// k
@@ -385,6 +396,24 @@ public class RegionScanner
 
 			if (command.hasOption("delete"))
 				chunksToDelete = getChunksListOrExit(command.getOptionValue("delete"), "delete parameter");
+			if (command.hasOption("fixentities"))
+			{
+				String fixEntitiesParam = command.getOptionValue("fixEntitties", "100");
+				try
+				{
+					maxEntities = Integer.valueOf(fixEntitiesParam);
+				}
+				catch (Exception e)
+				{
+					System.err.println("ERROR: fixEntities parameter must be a number");
+					System.exit(1);
+				}
+				if (maxEntities < 3)
+				{
+					System.err.println("ERROR: maxEntities parameter must be >= 3");
+					System.exit(1);
+				}
+			}
 			if (command.hasOption("from"))
 			{
 				verifyFileParameterOrExit(command.getOptionValue("from", ""), "from parameter");
@@ -451,14 +480,14 @@ public class RegionScanner
 			}
 			if (command.hasOption("scan"))
 				scan = true;
-			if (command.hasOption("stacks"))
+			if (command.hasOption("fixstacks"))
 				fixStacks = true;
 			if (command.hasOption("to"))
 			{
 				verifyFileParameterOrExit(command.getOptionValue("to", ""), "to parameter");
 				toLevel = command.getOptionValue("to", "");
 			}
-			if (command.hasOption("unknown"))
+			if (command.hasOption("fixunknown"))
 				fixUnknown = true;
 
 			// Verify options requirements
@@ -467,7 +496,7 @@ public class RegionScanner
         		System.err.println( "WARNING: no region file to process");
 				System.exit(0);
 			}
-			else if (fixUnknown == false && chunksToDelete == null && entitiesToKill == null && fixNames == false && chunksToPreserve == null && blocksToReplace == null && itemsToReplace == null && scan == false && fixStacks == false && toLevel.equals(""))
+			else if (fixUnknown == false && chunksToDelete == null && fixEntities == false && entitiesToKill == null && fixNames == false && chunksToPreserve == null && blocksToReplace == null && itemsToReplace == null && scan == false && fixStacks == false && toLevel.equals(""))
 			{
         		System.err.println( "WARNING: no actions specified");
 				System.exit(0);
