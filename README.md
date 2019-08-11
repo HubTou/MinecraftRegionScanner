@@ -16,6 +16,13 @@ Please check the tool's wiki at https://lotr-minecraft-mod-exiles.fandom.com/wik
 
 # Versions and changelog
 
+1.03 2019-08-11
+
+    - Show content of Mob Spawner tile entities (both vanilla and LOTR)
+    - Renamed options unknown to fixunknown and stacks to fixstacks
+    - Added detection and report of excessive number of entities in a single spot
+    - Added new option -e / --fixentities to fix excessive number of entities in a single spot
+
 1.02 2019-08-09
 
     - Provided our test bed in test/r.0.0.mca
@@ -69,4 +76,4 @@ The project logo is derived from EditOrange (https://www.deviantart.com/editoran
 
 Hubert Tournier
 
-August 9, 2019
+August 11, 2019

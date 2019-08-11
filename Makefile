@@ -1,4 +1,4 @@
-VERSION=1.02
+VERSION=1.03
 
 JC= javac
 JFLAGS= -Xlint:unchecked -d bin -sourcepath src -cp $(CLASSPATH)
